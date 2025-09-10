@@ -4,7 +4,7 @@ node_modules
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
-# bun.lock
+bun.lock
 
 .DS_Store
 .cache
@@ -15,11 +15,14 @@ node_modules
 .output
 .wrangler
 .netlify
+.nitro
 dist
 /build/
 /api/
 /server/build
 /public/build
+routeTree.gen.ts
 
 .tanstack
 # BMAD (local only)
+src/routeTree.gen.ts

@@ -18,6 +18,7 @@ import { Route as authPagesSignupRouteImport } from "./routes/(auth-pages)/signu
 import { Route as authPagesLoginRouteImport } from "./routes/(auth-pages)/login";
 import { Route as authenticatedDashboardRouteRouteImport } from "./routes/(authenticated)/dashboard/route";
 import { Route as authenticatedDashboardIndexRouteImport } from "./routes/(authenticated)/dashboard/index";
+import { ServerRoute as ApiKeysIndexServerRouteImport } from "./routes/api/keys/index";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 
 const rootServerRouteImport = createServerRootRoute();
@@ -57,6 +58,11 @@ const authenticatedDashboardIndexRoute =
     path: "/",
     getParentRoute: () => authenticatedDashboardRouteRoute,
   } as any);
+const ApiKeysIndexServerRoute = ApiKeysIndexServerRouteImport.update({
+  id: "/api/keys/",
+  path: "/api/keys/",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: "/api/auth/$",
   path: "/api/auth/$",
@@ -109,24 +115,28 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesByTo {
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/keys/": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths: "/api/auth/$";
+  fullPaths: "/api/auth/$" | "/api/keys";
   fileServerRoutesByTo: FileServerRoutesByTo;
-  to: "/api/auth/$";
-  id: "__root__" | "/api/auth/$";
+  to: "/api/auth/$" | "/api/keys";
+  id: "__root__" | "/api/auth/$" | "/api/keys/";
   fileServerRoutesById: FileServerRoutesById;
 }
 export interface RootServerRouteChildren {
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+  ApiKeysIndexServerRoute: typeof ApiKeysIndexServerRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -184,6 +194,13 @@ declare module "@tanstack/react-router" {
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
+    "/api/keys/": {
+      id: "/api/keys/";
+      path: "/api/keys";
+      fullPath: "/api/keys";
+      preLoaderRoute: typeof ApiKeysIndexServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/auth/$": {
       id: "/api/auth/$";
       path: "/api/auth/$";
@@ -244,6 +261,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiKeysIndexServerRoute: ApiKeysIndexServerRoute,
 };
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

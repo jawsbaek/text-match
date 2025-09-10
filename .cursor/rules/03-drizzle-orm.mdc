@@ -1,0 +1,15 @@
+---
+globs: *.ts
+description: Drizzle ORM usage rules
+---
+# Drizzle ORM Rules
+
+- Only construct the client in `[src/lib/db/index.ts](mdc:src/lib/db/index.ts)`; reuse `db` elsewhere.
+- Define schemas in `[src/lib/db/schema/*.ts](mdc:src/lib/db/schema/index.ts)` and export via barrel.
+- Use `snake_case` columns and let Drizzle handle mapping.
+- Wrap multi‑statement writes in transactions when updating related tables.
+- Prefer query builders with `where/and/eq/ilike` and `.limit()` for lists.
+- Never interpolate raw values into SQL strings; always use parameters.
+- Add indexes/migrations via `drizzle-kit`; keep schema drift controlled.
+- Validate inputs with Zod before DB calls; map enums via Zod to avoid invalid status.
+

@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+# TanStack Start + Drizzle Project Architecture
+
+- Prefer TanStack Start server routes for APIs; colocate under `src/routes/**`.
+- Use the shared DB client from `[src/lib/db/index.ts](mdc:src/lib/db/index.ts)` with Drizzle; schemas from `[src/lib/db/schema/index.ts](mdc:src/lib/db/schema/index.ts)`.
+- Keep schemas in `snake_case` per `[drizzle.config.ts](mdc:drizzle.config.ts)`; expose via schema barrel.
+- Environment variables must be declared in `[src/env/server.ts](mdc:src/env/server.ts)` and accessed server‑side only.
+- Use the path alias `~` for internal imports (e.g., `~/lib/db`).
+- All server handlers should return `Response` objects and set `content-type` appropriately.
+- Validate all inputs with Zod before DB access; fail fast with `400` on validation errors.
+- Logging: prefer structured messages; include request id if available.
+
+Folder conventions
+- `src/routes/` UI routes and server routes; server endpoints live alongside UI with TanStack Start.
+- `src/lib/` shared libraries (`auth`, `db`, utilities). Auth lives under `src/lib/auth/`.
+- `src/lib/db/schema/` contains Drizzle schema modules; export via `index.ts`.
+

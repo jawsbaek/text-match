@@ -1,0 +1,55 @@
+---
+alwaysApply: true
+description: Always use bun instead of npm commands
+---
+
+# Use Bun Instead of npm
+
+Always use `bun` commands instead of `npm` commands for package management and script execution.
+
+## Command Mappings
+
+- Use `bun install` instead of `npm install`
+- Use `bun add <package>` instead of `npm install <package>`
+- Use `bun remove <package>` instead of `npm uninstall <package>`
+- Use `bun run <script>` instead of `npm run <script>`
+- Use `bun <script>` instead of `npm run <script>` (bun can run scripts directly)
+- Use `bun dev` instead of `npm run dev`
+- Use `bun build` instead of `npm run build`
+- Use `bun test` instead of `npm test`
+
+## Examples
+
+**Package Installation:**
+```bash
+# ✅ Correct
+bun install
+bun add react
+bun add -d typescript
+
+# ❌ Avoid
+npm install
+npm install react
+npm install -D typescript
+```
+
+**Script Execution:**
+```bash
+# ✅ Correct
+bun dev
+bun build
+bun test
+bun run start
+
+# ❌ Avoid
+npm run dev
+npm run build
+npm test
+npm start
+```
+
+## Notes
+
+- Bun is faster and more efficient than npm
+- Bun has better compatibility with modern JavaScript/TypeScript projects
+- Always prefer bun commands in documentation, scripts, and terminal suggestions

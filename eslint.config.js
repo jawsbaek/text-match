@@ -10,7 +10,20 @@ import tseslint from "typescript-eslint";
 const { plugins: _, ...reactHooksConfig } = reactHooks.configs.recommended;
 
 export default defineConfig({
-  ignores: ["dist", ".wrangler", ".vercel", ".netlify", ".output", "build/"],
+  ignores: [
+    "dist",
+    ".wrangler",
+    ".vercel",
+    ".netlify",
+    ".output",
+    ".output/**/*",
+    "build/",
+    ".bmad-core",
+    ".cursor",
+    ".claude",
+    ".nitro/",
+    ".nitro/**/*",
+  ],
   files: ["**/*.{ts,tsx}"],
   languageOptions: {
     parser: tseslint.parser,

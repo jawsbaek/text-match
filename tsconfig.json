@@ -1,5 +1,14 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    ".nitro",
+    ".output",
+    "dist",
+    ".vercel",
+    ".netlify",
+    ".wrangler"
+  ],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,

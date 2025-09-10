@@ -9,6 +9,10 @@ routeTree.gen.ts
 .tanstack/
 drizzle/
 .drizzle/
+.bmad-core/
+.cursor/
+.claude/
+.nitro/
 
 # build outputs
 .vercel

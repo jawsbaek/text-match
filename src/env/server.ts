@@ -12,6 +12,10 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+    // Netlify Identity (GoTrue)
+    NETLIFY_IDENTITY_SITE: z.string().optional(),
+    NETLIFY_IDENTITY_AUD: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

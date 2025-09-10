@@ -1,0 +1,25 @@
+# Architecture
+
+## Table of Contents
+
+- [Architecture](#table-of-contents)
+  - [1. Overview](./1-overview.md)
+  - [2. Tech Stack](./2-tech-stack.md)
+  - [3. Deployment & Runtime](./3-deployment-runtime.md)
+  - [4. Repository Structure (selected)](./4-repository-structure-selected.md)
+  - [5. Backend: Server Routes](./5-backend-server-routes.md)
+    - [5.1 Implemented Endpoints](./5-backend-server-routes.md#51-implemented-endpoints)
+    - [5.2 Planned Endpoints (from PRD)](./5-backend-server-routes.md#52-planned-endpoints-from-prd)
+  - [6. Authentication & Authorization](./6-authentication-authorization.md)
+  - [7. Database & ORM](./7-database-orm.md)
+    - [7.1 Auth ()](./7-database-orm.md#71-auth)
+    - [7.2 L10n ()](./7-database-orm.md#72-l10n)
+  - [8. Environment & Configuration](./8-environment-configuration.md)
+  - [9. Validation, Errors, Logging](./9-validation-errors-logging.md)
+  - [10. Security (Current vs Planned)](./10-security-current-vs-planned.md)
+  - [11. Performance & Reliability Targets (from PRD)](./11-performance-reliability-targets-from-prd.md)
+  - [12. Roadmap Alignment (PRD → Implementation)](./12-roadmap-alignment-prd-implementation.md)
+  - [13. Development Standards](./13-development-standards.md)
+  - [14. Next Steps](./14-next-steps.md)
+  - [15. Sharding Plan (v4 Architecture Docs)](./15-sharding-plan-v4-architecture-docs.md)
+  - [16. Testing Strategy (Early)](./16-testing-strategy-early.md)

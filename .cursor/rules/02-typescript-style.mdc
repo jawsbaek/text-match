@@ -1,0 +1,16 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript style & safety rules
+---
+# TypeScript Style & Safety
+
+- Use explicit types for exported functions and public APIs. Avoid `any`.
+- Prefer `const` over `let`; avoid mutable state.
+- Narrow types early; use Zod schemas for runtime validation.
+- Handle errors with early returns; avoid deep nesting.
+- Do not catch errors without handling or rethrowing.
+- Keep functions small and focused; extract helpers for clarity.
+- Use named exports; avoid default exports in app code.
+- Keep imports sorted and path‑aliased (`~/*`).
+- Ensure all server‑only modules avoid importing client‑only code.
+

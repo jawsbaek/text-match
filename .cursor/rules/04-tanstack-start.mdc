@@ -1,0 +1,14 @@
+---
+globs: src/routes/**
+description: TanStack Start routing & server rules
+---
+# TanStack Start Rules
+
+- Use `createServerRoute`/`createServerFileRoute` for API endpoints.
+- Always validate `request.url` query/body with Zod before use.
+- Attach authentication via middleware from `[src/lib/auth/middleware.ts](mdc:src/lib/auth/middleware.ts)`.
+- Server routes should return `Response` with proper `content-type` headers.
+- Keep handlers pure and thin; delegate to `src/lib/*` services for logic.
+- Prefer small endpoints per resource (`/api/keys`, `/api/translations`, etc.).
+- Co‑locate route types near handlers; export only route.
+

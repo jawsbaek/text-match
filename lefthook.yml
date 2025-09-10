@@ -1,0 +1,48 @@
+# https://lefthook.dev/configuration/
+
+pre-commit:
+  parallel: true
+  jobs:
+    # TypeScript 타입 체크
+    - name: typescript-check
+      run: bun run tsc --noEmit
+      files: git diff --name-only --cached
+      glob: "*.{ts,tsx}"
+
+    # ESLint 실행 (스테이징된 파일만)
+    - name: eslint
+      run: bun run eslint {staged_files} --fix
+      files: git diff --name-only --cached
+      glob: "*.{js,ts,jsx,tsx}"
+      stage_fixed: true
+
+    # Prettier 포맷팅 (스테이징된 파일만)
+    - name: prettier
+      run: bun run prettier --write {staged_files}
+      files: git diff --name-only --cached
+      glob: "*.{js,ts,jsx,tsx,json,css,md}"
+      stage_fixed: true
+
+pre-push:
+  jobs:
+    # 전체 타입 체크
+    - name: typescript-build-check
+      run: bun run tsc --noEmit
+
+    # 전체 ESLint 체크
+    - name: eslint-all
+      run: bun run eslint src/ --max-warnings 20
+
+    # 테스트 실행 (테스트가 있는 경우)
+    # - name: tests
+    #   run: bun test
+
+    # 빌드 테스트
+    - name: build-check
+      run: bun run build
+
+commit-msg:
+  parallel: true
+  commands:
+    lint-commit-msg:
+      run: bunx commitlint --edit {1}

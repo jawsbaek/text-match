@@ -4,8 +4,9 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
+/// <reference types="vitest" />
 
-export default defineConfig({
+export default defineConfig(() => ({
   plugins: [
     devtools(),
     tsConfigPaths({
@@ -38,4 +39,16 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-});
+  test: {
+    environment: "node",
+    globals: true,
+    include: [
+      "src/**/*.{test,spec}.ts",
+      "src/**/*.{test,spec}.tsx",
+      "tests/**/*.{test,spec}.ts",
+    ],
+    coverage: {
+      reporter: ["text", "html"],
+    },
+  },
+}));
