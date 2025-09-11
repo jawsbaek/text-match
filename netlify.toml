@@ -1,0 +1,24 @@
+[build]
+  command = "bun run build"
+  publish = ".tanstack/start/build/client-dist"
+  functions = ".output/server"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[dev]
+  command = "vite dev --port 3000"
+  port = 8888
+  targetPort = 3000
+  publish = "public"
+
+# Netlify environment variables will be automatically injected
+# NETLIFY_DATABASE_URL will be available when Neon is connected via Netlify dashboard

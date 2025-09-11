@@ -3,7 +3,11 @@ import * as z from "zod";
 
 export const env = createEnv({
   server: {
-    DATABASE_URL: z.url(),
+    DATABASE_URL: z.preprocess(
+      (val) => (val === "" ? undefined : val),
+      z.string().url().optional(),
+    ),
+    NETLIFY_DATABASE_URL: z.url().optional(),
     VITE_BASE_URL: z.url().default("http://localhost:3000"),
     BETTER_AUTH_SECRET: z.string().min(1),
 

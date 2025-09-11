@@ -26,3 +26,4 @@ routeTree.gen.ts
 .tanstack
 # BMAD (local only)
 src/routeTree.gen.ts
+drizzle/

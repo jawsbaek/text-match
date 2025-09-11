@@ -13,16 +13,12 @@ export default defineConfig(() => ({
       projects: ["./tsconfig.json"],
     }),
     tanstackStart({
-      // https://github.com/TanStack/router/discussions/2863#discussioncomment-13713677
+      target: "netlify",
       customViteReactPlugin: true,
-
       tsr: {
         quoteStyle: "double",
         semicolons: true,
       },
-
-      // https://tanstack.com/start/latest/docs/framework/react/hosting#deployment
-      // target: "node-server",
     }),
     viteReact({
       // https://react.dev/learn/react-compiler

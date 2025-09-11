@@ -1,4 +1,6 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { boolean, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { service } from "./l10n.schema";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -59,3 +61,79 @@ export const verification = pgTable("verification", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const role = pgTable("role", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const permission = pgTable(
+  "permission",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    roleId: text("role_id")
+      .notNull()
+      .references(() => role.id, { onDelete: "cascade" }),
+    serviceId: text("service_id").references(() => service.id, { onDelete: "cascade" }), // For per-service permissions
+    permissions: jsonb("permissions").notNull().default({}),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("permission_user_id_idx").on(table.userId),
+    roleIdIdx: index("permission_role_id_idx").on(table.roleId),
+    serviceIdIdx: index("permission_service_id_idx").on(table.serviceId),
+  }),
+);
+
+// Relations
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  permissions: many(permission),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));
+
+export const roleRelations = relations(role, ({ many }) => ({
+  permissions: many(permission),
+}));
+
+export const permissionRelations = relations(permission, ({ one }) => ({
+  user: one(user, {
+    fields: [permission.userId],
+    references: [user.id],
+  }),
+  role: one(role, {
+    fields: [permission.roleId],
+    references: [role.id],
+  }),
+  service: one(service, {
+    fields: [permission.serviceId],
+    references: [service.id],
+  }),
+}));
