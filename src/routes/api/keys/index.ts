@@ -1,6 +1,8 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { and, eq, ilike, type SQL } from "drizzle-orm";
 import { z } from "zod";
+import { auth } from "~/lib/auth/auth";
+import { verifyIdentityJWT } from "~/lib/auth/identity";
 import { db } from "~/lib/db";
 import { l10nKey, service as serviceTbl } from "~/lib/db/schema";
 
@@ -12,9 +14,27 @@ export const createKeySchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
-// Create a server route without middleware for now
+// Create a server route with manual auth checking
 export const ServerRoute = createServerFileRoute("/api/keys/").methods({
   GET: async ({ request }: { request: Request }) => {
+    // Apply auth middleware manually
+    const headers = request.headers;
+    const bearer = headers.get("authorization");
+    const identityUser = await verifyIdentityJWT(bearer);
+
+    if (!identityUser) {
+      // Try better-auth session as fallback
+      const session = await auth.api.getSession({
+        headers,
+        query: { disableCookieCache: true },
+      });
+      if (!session) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "content-type": "application/json" },
+        });
+      }
+    }
     const url = new URL(request.url);
     const prefix = url.searchParams.get("prefix") || undefined;
     const serviceCode = url.searchParams.get("service") || undefined;
@@ -45,6 +65,24 @@ export const ServerRoute = createServerFileRoute("/api/keys/").methods({
     });
   },
   POST: async ({ request }: { request: Request }) => {
+    // Apply auth middleware manually
+    const headers = request.headers;
+    const bearer = headers.get("authorization");
+    const identityUser = await verifyIdentityJWT(bearer);
+
+    if (!identityUser) {
+      // Try better-auth session as fallback
+      const session = await auth.api.getSession({
+        headers,
+        query: { disableCookieCache: true },
+      });
+      if (!session) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "content-type": "application/json" },
+        });
+      }
+    }
     const body = await request.json().catch(() => ({}));
     const parsed = createKeySchema.safeParse(body);
     if (!parsed.success) {
