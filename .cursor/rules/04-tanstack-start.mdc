@@ -4,11 +4,67 @@ description: TanStack Start routing & server rules
 ---
 # TanStack Start Rules
 
-- Use `createServerRoute`/`createServerFileRoute` for API endpoints.
-- Always validate `request.url` query/body with Zod before use.
-- Attach authentication via middleware from `[src/lib/auth/middleware.ts](mdc:src/lib/auth/middleware.ts)`.
-- Server routes should return `Response` with proper `content-type` headers.
-- Keep handlers pure and thin; delegate to `src/lib/*` services for logic.
-- Prefer small endpoints per resource (`/api/keys`, `/api/translations`, etc.).
-- Co‑locate route types near handlers; export only route.
+## Router vs Start
+- Use TanStack Start for full‑stack needs (SSR, streaming, server functions). Use TanStack Router alone only for client‑side apps.
+- Favor file‑based routes with Start’s type‑safe APIs. [Docs](https://tanstack.com/start/latest/docs/framework/react/overview)
+
+## Server Routes (API)
+- Use `createServerFileRoute` (and `createServerRoute` when appropriate) from `@tanstack/react-start/server`.
+- Validate all inputs (search params/body) with Zod before use.
+- Return a `Response` with correct headers (e.g., `content-type: application/json`).
+- Keep route handlers thin; delegate business logic to `src/lib/**` services.
+- Prefer small, focused endpoints per resource (e.g., `/api/keys`, `/api/translations`).
+- Co‑locate route types near handlers; export only the `ServerRoute`.
+
+Example skeleton:
+
+```ts
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { z } from "zod";
+
+const querySchema = z.object({ q: z.string().min(1) });
+
+export const ServerRoute = createServerFileRoute("/api/example/")
+  .methods({
+    GET: async ({ request }): Promise<Response> => {
+      const url = new URL(request.url);
+      const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+      if (!parsed.success) {
+        return new Response(JSON.stringify({ error: z.treeifyError(parsed.error) }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      // Delegate to lib/service layer here
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "content-type": "application/json" },
+      });
+    },
+  });
+```
+
+## Middleware & Auth
+- Prefer Start middleware for cross‑cutting concerns; attach auth via `[src/lib/auth/middleware.ts](mdc:src/lib/auth/middleware.ts)`.
+- Do not import client‑only modules into server code.
+- Pass authenticated user context via middleware into handlers (typed context).
+
+## Server Functions & Environment Functions
+- Keep server‑only logic in server contexts (server routes/functions). Do not leak server code to client bundles.
+- Use environment helpers to read server env vars only on the server (`src/env/server.ts`).
+
+## SSR, Streaming, and Prerendering
+- Prefer full‑document SSR/streaming for dynamic pages; prerender static/marketing pages when possible.
+- Use cache headers on `Response` where appropriate.
+- Keep loaders/effects minimal and push heavy work to server routes/functions.
+
+## Search Params & Type Safety
+- Use Router/Start APIs and Zod to validate search params and maintain type safety.
+- Prefer JSON‑first responses and typed clients.
+
+## Project Conventions
+- Path aliases: use `~/*` as configured in `tsconfig.json`.
+- Keep imports sorted; external packages first, then `~/` internal modules.
+- Return early on validation/auth errors; avoid deep nesting.
+
+Reference: TanStack Start Overview and best practices. [Docs](https://tanstack.com/start/latest/docs/framework/react/overview)
 

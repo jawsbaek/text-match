@@ -55,7 +55,7 @@ examples:
 optional_fields_examples:
   quality_and_expiry: |
     quality_score: 75  # 0-100 (optional scoring)
-    expires: "2025-01-26T00:00:00Z"  # Optional gate freshness window
+    expires: "2025-09-26T00:00:00Z"  # Optional gate freshness window
 
   evidence: |
     evidence:
@@ -74,10 +74,10 @@ optional_fields_examples:
 
   history: |
     history:  # Append-only audit trail
-      - at: "2025-01-12T10:00:00Z"
+      - at: "2025-09-12T10:00:00Z"
         gate: FAIL
         note: "Initial review - missing tests"
-      - at: "2025-01-12T15:00:00Z"  
+      - at: "2025-09-12T15:00:00Z"  
         gate: CONCERNS
         note: "Tests added but rate limiting still missing"
 

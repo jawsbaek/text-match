@@ -4,6 +4,7 @@ description: TypeScript style & safety rules
 ---
 # TypeScript Style & Safety
 
+## Core TypeScript Rules
 - Use explicit types for exported functions and public APIs. Avoid `any`.
 - Prefer `const` over `let`; avoid mutable state.
 - Narrow types early; use Zod schemas for runtime validation.
@@ -13,4 +14,24 @@ description: TypeScript style & safety rules
 - Use named exports; avoid default exports in app code.
 - Keep imports sorted and path‑aliased (`~/*`).
 - Ensure all server‑only modules avoid importing client‑only code.
+
+## ESLint Compliance
+- Remove unused imports and variables immediately.
+- Use proper TypeScript types instead of `any`.
+- Follow strict null checks - handle undefined/null explicitly.
+- Use proper async/await patterns, avoid mixing with Promises.
+- Prefer interface over type for object definitions.
+- Use readonly arrays and objects where appropriate.
+- Follow consistent naming conventions (camelCase for variables, PascalCase for types).
+
+## Import Organization
+- Group imports: external packages first, then internal (`~/`) imports.
+- Remove unused imports before committing.
+- Use type-only imports when importing only types: `import type { Type } from 'module'`.
+
+## Error Handling
+- Use Result types or proper error boundaries.
+- Never ignore caught errors - log, handle, or rethrow.
+- Validate inputs with Zod before processing.
+- Return early on error conditions to avoid deep nesting.
 

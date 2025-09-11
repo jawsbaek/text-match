@@ -1,0 +1,124 @@
+---
+globs: src/**/*.ts,src/**/*.tsx
+description: Project-specific patterns and conventions
+---
+# Project Patterns & Conventions
+
+## File Organization
+- Routes: `src/routes/**/*.tsx` - TanStack Start file-based routing
+- API routes: `src/routes/api/**/*.ts` - Server-side endpoints
+- Components: `src/components/**/*.tsx` - Reusable UI components  
+- Database: `src/lib/db/**/*.ts` - Database schemas and utilities
+- Auth: `src/lib/auth/**/*.ts` - Authentication logic
+- Utils: `src/lib/utils.ts` - Shared utilities
+
+## Naming Conventions
+- Files: kebab-case (`user-profile.tsx`)
+- Components: PascalCase (`UserProfile`)
+- Functions: camelCase (`getUserProfile`)
+- Types/Interfaces: PascalCase (`UserProfile`, `CreateUserData`)
+- Constants: UPPER_SNAKE_CASE (`API_BASE_URL`)
+
+## API Route Patterns
+```typescript
+// Use createServerFileRoute for API endpoints
+export const ServerRoute = createServerFileRoute("/api/resource/")
+  .middleware([authMiddleware])
+  .methods({
+    GET: async ({ request, context }) => {
+      // Validate query params with Zod
+      const url = new URL(request.url);
+      const params = querySchema.safeParse(
+        Object.fromEntries(url.searchParams)
+      );
+      
+      if (!params.success) {
+        return new Response(JSON.stringify({ error: "Invalid params" }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      
+      // Business logic here
+      const result = await someService(params.data);
+      
+      return new Response(JSON.stringify(result), {
+        headers: { "content-type": "application/json" },
+      });
+    }
+  });
+```
+
+## Database Patterns
+- Schemas in `src/lib/db/schema/*.ts`
+- Export via barrel file: `src/lib/db/schema/index.ts`
+- Use snake_case for database columns
+- Import db from `~/lib/db` (not direct construction)
+- Use transactions for multi-table operations
+
+## Authentication Patterns
+- Auth middleware: `~/lib/auth/middleware`
+- Identity verification: `~/lib/auth/identity`
+- Auth configuration: `~/lib/auth/auth`
+- User context available in middleware-protected routes
+
+## Component Patterns
+```typescript
+// Component with proper typing
+interface UserProfileProps {
+  userId: string;
+  onUpdate?: (user: User) => void;
+}
+
+export function UserProfile({ userId, onUpdate }: UserProfileProps) {
+  // Component logic
+}
+
+// Export as named export (not default)
+export { UserProfile };
+```
+
+## Error Handling Patterns
+```typescript
+// API error responses
+return new Response(
+  JSON.stringify({ 
+    error: "Resource not found",
+    code: "RESOURCE_NOT_FOUND" 
+  }), 
+  {
+    status: 404,
+    headers: { "content-type": "application/json" },
+  }
+);
+
+// Zod validation errors
+if (!parsed.success) {
+  return new Response(
+    JSON.stringify({ error: z.treeifyError(parsed.error) }), 
+    {
+      status: 400,
+      headers: { "content-type": "application/json" },
+    }
+  );
+}
+```
+
+## Import Patterns
+```typescript
+// External packages first
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { z } from "zod";
+
+// Internal imports with ~ alias
+import { db } from "~/lib/db";
+import { userSchema } from "~/lib/db/schema";
+import type { User } from "~/lib/types";
+```
+
+## Testing Patterns
+- Test files: `*.test.ts` or `*.test.tsx`
+- Co-locate tests with source files when possible
+- Use Vitest for testing framework
+- Mock external dependencies properly
+- Test both happy path and error conditions

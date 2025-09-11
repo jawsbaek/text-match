@@ -1,0 +1,92 @@
+---
+alwaysApply: true
+description: TypeScript and ESLint compliance summary
+---
+# TypeScript & ESLint Compliance Guide
+
+## Quick Reference
+Your project is configured with strict TypeScript and ESLint rules. Here's what you need to know:
+
+## Essential Commands
+```bash
+# Check everything (recommended before commits)
+bun run check
+
+# Individual checks
+bun run lint          # ESLint validation
+bun run lint --fix    # Auto-fix ESLint issues  
+bun run format        # Prettier formatting
+bun run check-types   # TypeScript validation
+```
+
+## Key Rules to Follow
+1. **No unused imports/variables** - Remove immediately
+2. **Explicit return types** - Required for exported functions
+3. **Proper error handling** - Use try/catch, validate with Zod
+4. **Type safety** - Prefer `unknown` over `any`, use type guards
+5. **Import organization** - External packages first, then `~/` imports
+
+## Configuration Files
+- [eslint.config.js](mdc:eslint.config.js) - ESLint configuration
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration  
+- [lefthook.yml](mdc:lefthook.yml) - Pre-commit hooks
+- [.cursor/rules/](mdc:.cursor/rules/) - Detailed coding standards
+
+## Auto-Fix Workflow
+```bash
+# Fix most issues automatically
+bun run lint --fix
+bun run format
+
+# Check remaining issues
+bun run check
+```
+
+## Common Patterns
+```typescript
+// ✅ Good API route
+export const ServerRoute = createServerFileRoute("/api/resource/")
+  .methods({
+    GET: async ({ request }): Promise<Response> => {
+      const url = new URL(request.url);
+      const params = schema.safeParse(
+        Object.fromEntries(url.searchParams)
+      );
+      
+      if (!params.success) {
+        return new Response(JSON.stringify({ error: "Invalid params" }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      
+      const result = await getData(params.data);
+      return new Response(JSON.stringify(result), {
+        headers: { "content-type": "application/json" },
+      });
+    }
+  });
+
+// ✅ Good component
+interface Props {
+  userId: string;
+  onUpdate?: (user: User) => void;
+}
+
+export function UserProfile({ userId, onUpdate }: Props): JSX.Element {
+  // Component logic
+}
+```
+
+## Pre-commit Protection
+- Lefthook prevents commits with lint/type errors
+- All code must pass `bun run check` before commit
+- Generated files in `.netlify/` are ignored
+
+## IDE Setup Recommendations
+- Install ESLint extension
+- Enable format on save
+- Enable auto-fix on save for ESLint
+- Configure TypeScript error highlighting
+
+Your codebase is now fully compliant with TypeScript and ESLint standards!

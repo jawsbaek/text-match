@@ -1,0 +1,73 @@
+---
+globs: *.ts,*.tsx,*.js,*.jsx
+description: ESLint configuration and compliance rules
+---
+# ESLint Compliance Rules
+
+## Configuration
+- ESLint config is in [eslint.config.js](mdc:eslint.config.js)
+- TypeScript config is in [tsconfig.json](mdc:tsconfig.json)
+- Run `bun run lint` to check for issues
+- Run `bun run lint --fix` to auto-fix issues
+- Run `bun run check` for full validation (format + lint + type check)
+
+## Critical Rules
+- **No unused variables/imports**: Remove immediately when detected
+- **Explicit return types**: Required for exported functions
+- **Strict null checks**: Handle undefined/null explicitly with optional chaining or guards
+- **No any types**: Use proper TypeScript types or unknown with type guards
+- **Consistent async patterns**: Use async/await, avoid mixing with .then()
+
+## Auto-fixable Issues
+These can be fixed automatically with `bun run lint --fix`:
+- Import organization and sorting
+- Semicolon placement
+- Quote consistency
+- Spacing and indentation
+- Trailing commas
+
+## Manual Fix Required
+These need manual attention:
+- Unused variables and imports
+- Type annotations for exported functions
+- Error handling patterns
+- Async/await vs Promise patterns
+- Proper null/undefined handling
+
+## React-Specific Rules
+- Use proper React hooks patterns
+- Follow React Query conventions from [@tanstack/eslint-plugin-query](mdc:package.json)
+- Follow TanStack Router patterns from [@tanstack/eslint-plugin-router](mdc:package.json)
+- Proper React component typing with props interfaces
+
+## Pre-commit Checks
+- Lefthook runs on commit (see [lefthook.yml](mdc:lefthook.yml))
+- All lint errors must be fixed before commit
+- Type checking must pass
+- Formatting must be consistent
+
+## Common Fixes
+```typescript
+// ❌ Bad - unused import
+import { IdentityUser } from "~/lib/auth/identity";
+
+// ✅ Good - remove unused or use type-only import
+import type { IdentityUser } from "~/lib/auth/identity";
+
+// ❌ Bad - missing return type
+export function getData() {
+  return { items: [] };
+}
+
+// ✅ Good - explicit return type
+export function getData(): { items: unknown[] } {
+  return { items: [] };
+}
+
+// ❌ Bad - any type
+const data: any = await response.json();
+
+// ✅ Good - proper typing with validation
+const data: unknown = await response.json();
+const validated = schema.parse(data);
+```

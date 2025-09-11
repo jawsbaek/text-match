@@ -1,0 +1,65 @@
+---
+alwaysApply: true
+description: Linting workflow and generated files handling
+---
+# Linting Workflow
+
+## Daily Workflow
+1. **Before coding**: Run `bun run check` to ensure clean state
+2. **During development**: Use IDE ESLint integration for real-time feedback
+3. **Before commit**: Lefthook automatically runs linting (see [lefthook.yml](mdc:lefthook.yml))
+4. **Fix issues immediately**: Don't let lint errors accumulate
+
+## Commands
+- `bun run lint` - Check for ESLint issues
+- `bun run lint --fix` - Auto-fix fixable issues
+- `bun run format` - Format code with Prettier
+- `bun run check-types` - TypeScript type checking
+- `bun run check` - Run all checks (format + lint + types)
+
+## Generated Files to Ignore
+These files are auto-generated and should not be manually edited:
+- `.netlify/functions-internal/**/*` - Netlify build artifacts
+- `src/routeTree.gen.ts` - TanStack Router generated routes
+- `.output/**/*` - Build output
+- `dist/**/*` - Distribution files
+
+## ESLint Configuration
+- Config file: [eslint.config.js](mdc:eslint.config.js)
+- Ignores generated files and build artifacts
+- Uses TypeScript-ESLint with strict rules
+- Includes React, TanStack Query, and TanStack Router plugins
+
+## Common Lint Error Fixes
+```bash
+# Fix auto-fixable issues
+bun run lint --fix
+
+# Fix import organization
+bun run format
+
+# Check what specific rules are failing
+bun run lint --no-fix
+
+# Run full check suite
+bun run check
+```
+
+## IDE Integration
+- Ensure ESLint extension is installed and enabled
+- Configure auto-fix on save for better workflow
+- Set up format on save with Prettier
+- Enable TypeScript error highlighting
+
+## Troubleshooting
+- If lint errors in generated files persist, check [eslint.config.js](mdc:eslint.config.js) ignore patterns
+- For persistent TypeScript errors, run `bun run check-types` for detailed output
+- Clear cache with `rm -rf .eslintcache` if needed
+- Regenerate route tree with TanStack Router CLI if route errors occur
+
+## Pre-commit Hooks
+Lefthook configuration in [lefthook.yml](mdc:lefthook.yml) runs:
+- Code formatting check
+- ESLint validation
+- TypeScript type checking
+- Prevents commits with lint errors

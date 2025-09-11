@@ -1,0 +1,90 @@
+---
+globs: *.ts,*.tsx
+description: Code quality and best practices for TypeScript
+---
+# Code Quality Standards
+
+## Function Design
+- Keep functions small (< 20 lines when possible)
+- Single responsibility principle
+- Pure functions when possible (no side effects)
+- Explicit return types for exported functions
+- Use descriptive parameter and variable names
+
+## Type Safety
+- Prefer `unknown` over `any` and use type guards
+- Use union types instead of loose object types
+- Implement proper error types with discriminated unions
+- Use `as const` for literal types
+- Prefer type assertions over type casting when necessary
+
+## Async Patterns
+```typescript
+// ✅ Good - consistent async/await
+export async function fetchData(id: string): Promise<Data> {
+  try {
+    const response = await fetch(`/api/data/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`);
+    }
+    const data: unknown = await response.json();
+    return dataSchema.parse(data);
+  } catch (error) {
+    // Log and rethrow or handle appropriately
+    console.error('Failed to fetch data:', error);
+    throw error;
+  }
+}
+
+// ❌ Avoid - mixing async/await with .then()
+export async function fetchDataBad(id: string) {
+  return fetch(`/api/data/${id}`)
+    .then(response => response.json())
+    .then(data => data);
+}
+```
+
+## Error Handling
+- Always handle errors explicitly
+- Use Result types or proper error boundaries
+- Log errors with context
+- Validate external data with Zod schemas
+- Fail fast with early returns
+
+## Import/Export Patterns
+```typescript
+// ✅ Good - organized imports
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { and, eq, ilike } from "drizzle-orm";
+import { z } from "zod";
+
+import { db } from "~/lib/db";
+import { l10nKey } from "~/lib/db/schema";
+import type { IdentityUser } from "~/lib/auth/identity";
+
+// ✅ Good - named exports
+export const createKeySchema = z.object({...});
+export async function createKey(data: CreateKeyData): Promise<Key> {...}
+
+// ❌ Avoid - default exports in app code
+export default function SomeFunction() {...}
+```
+
+## Database Patterns
+- Use transactions for multi-table operations
+- Always validate inputs before DB operations
+- Use proper Drizzle query builders
+- Handle database errors gracefully
+- Use connection from [~/lib/db](mdc:src/lib/db/index.ts)
+
+## Testing Considerations
+- Write testable code (pure functions, dependency injection)
+- Use proper mocking for external dependencies
+- Test error conditions and edge cases
+- Keep test files co-located with source files when possible
+
+## Performance
+- Avoid unnecessary re-renders in React components
+- Use proper React Query patterns for data fetching
+- Implement proper loading and error states
+- Consider memo for expensive computations

@@ -7,7 +7,7 @@ import { verifyIdentityJWT, type IdentityUser } from "~/lib/auth/identity";
 import { createForbiddenResponse, PERMISSIONS } from "~/lib/auth/rbac";
 import { validateServiceAccess } from "~/lib/auth/service-access";
 import { db } from "~/lib/db";
-import { l10nKey, service as serviceTbl } from "~/lib/db/schema";
+import { l10nKey, service as serviceTbl, translation } from "~/lib/db/schema";
 
 export const createKeySchema = z.object({
   id: z.string().min(1),
@@ -15,6 +15,17 @@ export const createKeySchema = z.object({
   serviceCode: z.string().min(1).optional(),
   namespaceId: z.string().optional(),
   tags: z.array(z.string()).optional(),
+});
+
+export const getKeysQuerySchema = z.object({
+  prefix: z.string().optional(),
+  service: z.string().optional(),
+  locale: z
+    .enum(["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh", "ar", "hi"])
+    .optional(),
+  status: z.enum(["draft", "active", "archived"]).optional(),
+  limit: z.coerce.number().min(1).max(100).default(100),
+  offset: z.coerce.number().min(0).default(0),
 });
 
 /**
@@ -63,10 +74,20 @@ export const ServerRoute = createServerFileRoute("/api/keys/").methods({
     }
 
     const url = new URL(request.url);
-    const prefix = url.searchParams.get("prefix") || undefined;
-    const serviceCode = url.searchParams.get("service") || undefined;
+    const queryParams = Object.fromEntries(url.searchParams);
+    const parsed = getKeysQuerySchema.safeParse(queryParams);
+
+    if (!parsed.success) {
+      return new Response(JSON.stringify({ error: z.treeifyError(parsed.error) }), {
+        status: 400,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
+    const { prefix, service: serviceCode, locale, status, limit, offset } = parsed.data;
 
     const conds: SQL<unknown>[] = [];
+    let needsTranslationJoin = false;
 
     // Apply service-level access control for read permission
     // For non-admin users who don't have view role, restrict to owned services
@@ -95,6 +116,7 @@ export const ServerRoute = createServerFileRoute("/api/keys/").methods({
     if (prefix) {
       conds.push(ilike(l10nKey.keyName, `${prefix}%`));
     }
+
     if (serviceCode) {
       // join service by code
       const svc = await db.query.service.findFirst({
@@ -105,18 +127,72 @@ export const ServerRoute = createServerFileRoute("/api/keys/").methods({
       }
     }
 
-    // Execute query with all conditions
-    const rows = conds.length
-      ? await db
-          .select()
-          .from(l10nKey)
-          .where(and(...conds))
-          .limit(100)
-      : await db.select().from(l10nKey).limit(100);
+    if (status) {
+      conds.push(eq(l10nKey.status, status));
+    }
 
-    return new Response(JSON.stringify({ items: rows }), {
-      headers: { "content-type": "application/json" },
-    });
+    if (locale) {
+      needsTranslationJoin = true;
+      conds.push(eq(translation.locale, locale));
+    }
+
+    // Execute queries based on whether we need translation join
+    let rows;
+    let totalCount;
+
+    if (needsTranslationJoin) {
+      // Query with translation join
+      const baseQuery = db
+        .select()
+        .from(l10nKey)
+        .innerJoin(translation, eq(l10nKey.id, translation.keyId));
+
+      const finalQuery = conds.length > 0 ? baseQuery.where(and(...conds)) : baseQuery;
+
+      rows = await finalQuery.limit(limit).offset(offset);
+
+      // Count query with join
+      const countBaseQuery = db
+        .select({ count: sql<number>`count(DISTINCT ${l10nKey.id})` })
+        .from(l10nKey)
+        .innerJoin(translation, eq(l10nKey.id, translation.keyId));
+
+      const countFinalQuery =
+        conds.length > 0 ? countBaseQuery.where(and(...conds)) : countBaseQuery;
+
+      const [{ count }] = await countFinalQuery;
+      totalCount = count;
+    } else {
+      // Query without translation join
+      const baseQuery = db.select().from(l10nKey);
+
+      const finalQuery = conds.length > 0 ? baseQuery.where(and(...conds)) : baseQuery;
+
+      rows = await finalQuery.limit(limit).offset(offset);
+
+      // Count query without join
+      const countBaseQuery = db.select({ count: sql<number>`count(*)` }).from(l10nKey);
+
+      const countFinalQuery =
+        conds.length > 0 ? countBaseQuery.where(and(...conds)) : countBaseQuery;
+
+      const [{ count }] = await countFinalQuery;
+      totalCount = count;
+    }
+
+    return new Response(
+      JSON.stringify({
+        items: rows,
+        pagination: {
+          limit,
+          offset,
+          count: totalCount,
+        },
+      }),
+      {
+        headers: { "content-type": "application/json" },
+      },
+    );
   },
   POST: async ({ request }: { request: Request }) => {
     // Get authenticated user

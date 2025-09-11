@@ -9,44 +9,47 @@ import tseslint from "typescript-eslint";
 
 const { plugins: _, ...reactHooksConfig } = reactHooks.configs.recommended;
 
-export default defineConfig({
-  ignores: [
-    "dist",
-    ".wrangler",
-    ".vercel",
-    ".netlify",
-    ".output",
-    ".output/**/*",
-    "build/",
-    ".bmad-core",
-    ".cursor",
-    ".claude",
-    ".nitro/",
-    ".nitro/**/*",
-  ],
-  files: ["**/*.{ts,tsx}"],
-  languageOptions: {
-    parser: tseslint.parser,
-    parserOptions: {
-      projectService: true,
-      tsconfigRootDir: import.meta.dirname,
+export default defineConfig([
+  {
+    ignores: [
+      "dist/**",
+      ".wrangler/**",
+      ".vercel/**",
+      ".netlify/**",
+      ".output/**",
+      "build/**",
+      ".bmad-core/**",
+      ".cursor/**",
+      ".claude/**",
+      ".nitro/**",
+      "**/*.mjs",
+    ],
+  },
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: {
+      "react-hooks": reactHooks,
+    },
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+      eslintConfigPrettier,
+      ...pluginQuery.configs["flat/recommended"],
+      ...pluginRouter.configs["flat/recommended"],
+      reactHooksConfig,
+      react.configs["recommended-type-checked"],
+      // ...you can add plugins or configs here
+    ],
+    rules: {
+      // You can override any rules here
+      "@typescript-eslint/no-deprecated": "warn",
     },
   },
-  plugins: {
-    "react-hooks": reactHooks,
-  },
-  extends: [
-    js.configs.recommended,
-    ...tseslint.configs.recommended,
-    eslintConfigPrettier,
-    ...pluginQuery.configs["flat/recommended"],
-    ...pluginRouter.configs["flat/recommended"],
-    reactHooksConfig,
-    react.configs["recommended-type-checked"],
-    // ...you can add plugins or configs here
-  ],
-  rules: {
-    // You can override any rules here
-    "@typescript-eslint/no-deprecated": "warn",
-  },
-});
+]);

@@ -19,6 +19,7 @@ import { Route as authPagesLoginRouteImport } from "./routes/(auth-pages)/login"
 import { Route as authenticatedDashboardRouteRouteImport } from "./routes/(authenticated)/dashboard/route";
 import { Route as authenticatedDashboardIndexRouteImport } from "./routes/(authenticated)/dashboard/index";
 import { ServerRoute as ApiKeysIndexServerRouteImport } from "./routes/api/keys/index";
+import { ServerRoute as ApiTranslationsIdServerRouteImport } from "./routes/api/translations/$id";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 
 const rootServerRouteImport = createServerRootRoute();
@@ -61,6 +62,11 @@ const authenticatedDashboardIndexRoute =
 const ApiKeysIndexServerRoute = ApiKeysIndexServerRouteImport.update({
   id: "/api/keys/",
   path: "/api/keys/",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiTranslationsIdServerRoute = ApiTranslationsIdServerRouteImport.update({
+  id: "/api/translations/$id",
+  path: "/api/translations/$id",
   getParentRoute: () => rootServerRouteImport,
 } as any);
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -115,27 +121,31 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/translations/$id": typeof ApiTranslationsIdServerRoute;
   "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesByTo {
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/translations/$id": typeof ApiTranslationsIdServerRoute;
   "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/translations/$id": typeof ApiTranslationsIdServerRoute;
   "/api/keys/": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths: "/api/auth/$" | "/api/keys";
+  fullPaths: "/api/auth/$" | "/api/translations/$id" | "/api/keys";
   fileServerRoutesByTo: FileServerRoutesByTo;
-  to: "/api/auth/$" | "/api/keys";
-  id: "__root__" | "/api/auth/$" | "/api/keys/";
+  to: "/api/auth/$" | "/api/translations/$id" | "/api/keys";
+  id: "__root__" | "/api/auth/$" | "/api/translations/$id" | "/api/keys/";
   fileServerRoutesById: FileServerRoutesById;
 }
 export interface RootServerRouteChildren {
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+  ApiTranslationsIdServerRoute: typeof ApiTranslationsIdServerRoute;
   ApiKeysIndexServerRoute: typeof ApiKeysIndexServerRoute;
 }
 
@@ -201,6 +211,13 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiKeysIndexServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+    "/api/translations/$id": {
+      id: "/api/translations/$id";
+      path: "/api/translations/$id";
+      fullPath: "/api/translations/$id";
+      preLoaderRoute: typeof ApiTranslationsIdServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/auth/$": {
       id: "/api/auth/$";
       path: "/api/auth/$";
@@ -261,6 +278,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiTranslationsIdServerRoute: ApiTranslationsIdServerRoute,
   ApiKeysIndexServerRoute: ApiKeysIndexServerRoute,
 };
 export const serverRouteTree = rootServerRouteImport

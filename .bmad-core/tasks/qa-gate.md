@@ -46,7 +46,7 @@ story: '1.3'
 gate: CONCERNS
 status_reason: 'Missing rate limiting on auth endpoints poses security risk.'
 reviewer: 'Quinn'
-updated: '2025-01-12T10:15:00Z'
+updated: '2025-09-12T10:15:00Z'
 top_issues:
   - id: 'SEC-001'
     severity: high # ONLY: low|medium|high
@@ -67,7 +67,7 @@ story: '1.3'
 gate: WAIVED
 status_reason: 'Known issues accepted for MVP release.'
 reviewer: 'Quinn'
-updated: '2025-01-12T10:15:00Z'
+updated: '2025-09-12T10:15:00Z'
 top_issues:
   - id: 'PERF-001'
     severity: low
@@ -143,7 +143,7 @@ After creating gate file, append to story's QA Results section:
 ```markdown
 ## QA Results
 
-### Review Date: 2025-01-12
+### Review Date: 2025-09-12
 
 ### Reviewed By: Quinn (Test Architect)
 
