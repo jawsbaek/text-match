@@ -1,4 +1,8 @@
+import { eq, sql } from "drizzle-orm";
+
 import type { IdentityUser } from "~/lib/auth/identity";
+import { db } from "~/lib/db";
+import { service } from "~/lib/db/schema";
 
 /**
  * Role-Based Access Control (RBAC) Helper Functions
@@ -103,4 +107,114 @@ export function createForbiddenResponse(message = "Insufficient permissions"): R
     status: 403,
     headers: { "content-type": "application/json" },
   });
+}
+
+// Permission constants for service-level access
+export const PERMISSIONS = {
+  READ: "read",
+  WRITE: "write",
+} as const;
+
+export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+
+/**
+ * Check if user can access a specific service with the given permission
+ * @param user - The authenticated user
+ * @param serviceId - The service ID to check access for
+ * @param permission - The permission level required ('read' or 'write')
+ * @returns true if user has access, false otherwise
+ */
+export async function canAccessService(
+  user: IdentityUser | undefined,
+  serviceId: string,
+  permission: Permission,
+): Promise<boolean> {
+  if (!user) return false;
+
+  // Admin has access to everything
+  if (isAdmin(user)) return true;
+
+  // Check if user is owner of the service
+  if (await isServiceOwner(user, serviceId)) return true;
+
+  // For non-owners, check role-based permissions
+  switch (permission) {
+    case PERMISSIONS.READ:
+      return canView(user);
+    case PERMISSIONS.WRITE:
+      return canEdit(user);
+    default:
+      return false;
+  }
+}
+
+/**
+ * Get all services that a user can access with the given permission
+ * @param user - The authenticated user
+ * @param permission - The permission level required ('read' or 'write')
+ * @returns Array of service IDs the user can access
+ */
+export async function getAccessibleServices(
+  user: IdentityUser | undefined,
+  permission: Permission,
+): Promise<string[]> {
+  if (!user) return [];
+
+  // Admin has access to all services
+  if (isAdmin(user)) {
+    const allServices = await db.select({ id: service.id }).from(service);
+    return allServices.map((s) => s.id);
+  }
+
+  // Get services owned by the user
+  const ownedServices = await db
+    .select({ id: service.id })
+    .from(service)
+    .where(sql`${user.sub} = ANY(${service.owners})`);
+
+  const ownedServiceIds = ownedServices.map((s) => s.id);
+
+  // For read permission, if user has view role, they can access all services
+  if (permission === PERMISSIONS.READ && canView(user)) {
+    const allServices = await db.select({ id: service.id }).from(service);
+    return allServices.map((s) => s.id);
+  }
+
+  // For write permission, check if user has edit role
+  if (permission === PERMISSIONS.WRITE && canEdit(user)) {
+    // For now, editors can only write to services they own
+    // This can be extended later to support team assignments
+    return ownedServiceIds;
+  }
+
+  // Default to owned services only
+  return ownedServiceIds;
+}
+
+/**
+ * Check if user is an owner of a specific service
+ * @param user - The authenticated user
+ * @param serviceId - The service ID to check ownership for
+ * @returns true if user owns the service, false otherwise
+ */
+export async function isServiceOwner(
+  user: IdentityUser | undefined,
+  serviceId: string,
+): Promise<boolean> {
+  if (!user) return false;
+
+  try {
+    const serviceRecord = await db
+      .select({ owners: service.owners })
+      .from(service)
+      .where(eq(service.id, serviceId))
+      .limit(1);
+
+    if (serviceRecord.length === 0) return false;
+
+    return serviceRecord[0].owners.includes(user.sub);
+  } catch (error) {
+    console.error("Error checking service ownership:", error);
+    return false;
+  }
 }
