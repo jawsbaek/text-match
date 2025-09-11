@@ -91,11 +91,11 @@ export const permission = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => ({
-    userIdIdx: index("permission_user_id_idx").on(table.userId),
-    roleIdIdx: index("permission_role_id_idx").on(table.roleId),
-    serviceIdIdx: index("permission_service_id_idx").on(table.serviceId),
-  }),
+  (table) => [
+    index("permission_user_id_idx").on(table.userId),
+    index("permission_role_id_idx").on(table.roleId),
+    index("permission_service_id_idx").on(table.serviceId),
+  ],
 );
 
 // Relations

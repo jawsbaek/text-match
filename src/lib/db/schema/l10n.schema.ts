@@ -104,11 +104,11 @@ export const event = pgTable(
     after: jsonb("after"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => ({
-    entityTypeIdx: index("event_entity_type_idx").on(table.entityType),
-    entityIdIdx: index("event_entity_id_idx").on(table.entityId),
-    createdAtIdx: index("event_created_at_idx").on(table.createdAt),
-  }),
+  (table) => [
+    index("event_entity_type_idx").on(table.entityType),
+    index("event_entity_id_idx").on(table.entityId),
+    index("event_created_at_idx").on(table.createdAt),
+  ],
 );
 
 // Relations

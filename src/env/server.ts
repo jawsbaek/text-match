@@ -5,10 +5,19 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.preprocess(
       (val) => (val === "" ? undefined : val),
-      z.string().url().optional(),
+      z
+        .string()
+        .regex(/^https?:\/\/.+/)
+        .optional(),
     ),
-    NETLIFY_DATABASE_URL: z.url().optional(),
-    VITE_BASE_URL: z.url().default("http://localhost:3000"),
+    NETLIFY_DATABASE_URL: z
+      .string()
+      .regex(/^https?:\/\/.+/)
+      .optional(),
+    VITE_BASE_URL: z
+      .string()
+      .regex(/^https?:\/\/.+/)
+      .default("http://localhost:3000"),
     BETTER_AUTH_SECRET: z.string().min(1),
 
     // OAuth2 providers, optional, update as needed
