@@ -10,6 +10,6 @@ export default {
   dialect: "postgresql",
   casing: "snake_case",
   dbCredentials: {
-    url: process.env.NETLIFY_DATABASE_URL || env.DATABASE_URL || "",
+    url: env.NETLIFY_DATABASE_URL || env.DATABASE_URL || "",
   },
 } satisfies Config;

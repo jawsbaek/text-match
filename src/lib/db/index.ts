@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { neon } from "@netlify/neon";
 import { serverOnly } from "@tanstack/react-start";
 import { drizzle } from "drizzle-orm/neon-http";
 import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
@@ -8,17 +8,14 @@ import { env } from "~/env/server";
 import * as schema from "~/lib/db/schema";
 
 const getDatabase = serverOnly(() => {
-  // Use Netlify Neon in production/Netlify environment
-  if (process.env.NETLIFY_DATABASE_URL) {
-    const driver = neon(process.env.NETLIFY_DATABASE_URL);
-    return drizzle(driver, { schema, casing: "snake_case" });
-  }
-
   // Use regular PostgreSQL for local development
   if (env.DATABASE_URL) {
     const driver = postgres(env.DATABASE_URL);
     return drizzlePostgres({ client: driver, schema, casing: "snake_case" });
   }
+
+  const driver = neon();
+  return drizzle(driver, { schema, casing: "snake_case" });
 
   throw new Error(
     "No database URL configured. Set either NETLIFY_DATABASE_URL or DATABASE_URL",
