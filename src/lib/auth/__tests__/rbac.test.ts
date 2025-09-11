@@ -10,29 +10,42 @@ import {
   hasRole,
   isAdmin,
   isOwner,
+  PERMISSIONS,
 } from "~/lib/auth/rbac";
 
 describe("RBAC Helper Functions", () => {
   const adminUser: IdentityUser = {
-    sub: "user1",
+    sub: "admin-user-id",
     email: "admin@test.com",
     roles: ["Admin"],
   };
 
+  const ownerUser: IdentityUser = {
+    sub: "owner-user-id",
+    email: "owner@test.com",
+    roles: ["Owner"],
+  };
+
   const editorUser: IdentityUser = {
-    sub: "user2",
+    sub: "editor-user-id",
     email: "editor@test.com",
     roles: ["Editor", "Viewer"],
   };
 
+  const reviewerUser: IdentityUser = {
+    sub: "reviewer-user-id",
+    email: "reviewer@test.com",
+    roles: ["Reviewer", "Viewer"],
+  };
+
   const viewerUser: IdentityUser = {
-    sub: "user3",
+    sub: "viewer-user-id",
     email: "viewer@test.com",
     roles: ["Viewer"],
   };
 
   const noRolesUser: IdentityUser = {
-    sub: "user4",
+    sub: "noroles-user-id",
     email: "noroles@test.com",
     roles: undefined,
   };
@@ -93,7 +106,6 @@ describe("RBAC Helper Functions", () => {
     });
 
     it("should identify owner users", () => {
-      const ownerUser: IdentityUser = { ...adminUser, roles: ["Owner"] };
       expect(isOwner(ownerUser)).toBe(true);
       expect(isOwner(adminUser)).toBe(false);
     });
@@ -107,10 +119,8 @@ describe("RBAC Helper Functions", () => {
     it("should identify users who can review", () => {
       expect(canReview(adminUser)).toBe(true);
       expect(canReview(editorUser)).toBe(true);
-      expect(canReview(viewerUser)).toBe(false);
-
-      const reviewerUser: IdentityUser = { ...viewerUser, roles: ["Reviewer"] };
       expect(canReview(reviewerUser)).toBe(true);
+      expect(canReview(viewerUser)).toBe(false);
     });
 
     it("should identify users who can view", () => {
@@ -136,6 +146,13 @@ describe("RBAC Helper Functions", () => {
 
       const body = await response.json();
       expect(body.error).toBe("Custom error message");
+    });
+  });
+
+  describe("Permission constants", () => {
+    it("should have correct permission values", () => {
+      expect(PERMISSIONS.READ).toBe("read");
+      expect(PERMISSIONS.WRITE).toBe("write");
     });
   });
 });
