@@ -44,21 +44,32 @@ export async function verifyIdentityJWT(
   const audience = env.NETLIFY_IDENTITY_AUD;
   const issuer = env.NETLIFY_IDENTITY_SITE;
 
-  const { payload } = await jwtVerify(token, await getJwks(), {
-    audience: audience || undefined,
-    issuer: issuer || undefined,
-  });
+  // Return null if Netlify Identity is not configured
+  if (!issuer) {
+    return null;
+  }
 
-  const typedPayload = payload as NetlifyJWTPayload;
-  const roles = Array.isArray(typedPayload.app_metadata?.roles)
-    ? typedPayload.app_metadata.roles
-    : undefined;
+  try {
+    const { payload } = await jwtVerify(token, await getJwks(), {
+      audience: audience || undefined,
+      issuer: issuer || undefined,
+    });
 
-  return {
-    sub: String(typedPayload.sub),
-    email: typeof typedPayload.email === "string" ? typedPayload.email : undefined,
-    app_metadata: typedPayload.app_metadata,
-    user_metadata: typedPayload.user_metadata,
-    roles,
-  };
+    const typedPayload = payload as NetlifyJWTPayload;
+    const roles = Array.isArray(typedPayload.app_metadata?.roles)
+      ? typedPayload.app_metadata.roles
+      : undefined;
+
+    return {
+      sub: String(typedPayload.sub),
+      email: typeof typedPayload.email === "string" ? typedPayload.email : undefined,
+      app_metadata: typedPayload.app_metadata,
+      user_metadata: typedPayload.user_metadata,
+      roles,
+    };
+  } catch (error) {
+    // Log JWT verification errors but return null to allow fallback to session auth
+    console.error("JWT verification failed:", error);
+    return null;
+  }
 }
