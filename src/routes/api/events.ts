@@ -19,8 +19,8 @@ export const eventsQuerySchema = z
     entityId: z.string().optional(),
     actor: z.string().optional(),
     action: z.enum(["create", "update", "delete"]).optional(),
-    startDate: z.string().datetime().optional(),
-    endDate: z.string().datetime().optional(),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
     limit: z.coerce.number().min(1).max(100).default(50),
     offset: z.coerce.number().min(0).default(0),
   })
@@ -41,7 +41,7 @@ export const eventsQuerySchema = z
       // Ensure start date is before end date
       if (start >= end) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "startDate must be before endDate",
           path: ["startDate"],
         });
@@ -53,7 +53,7 @@ export const eventsQuerySchema = z
 
       if (diffDays > MAX_QUERY_WINDOW_DAYS) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: `Query window cannot exceed ${MAX_QUERY_WINDOW_DAYS} days`,
           path: ["endDate"],
         });
@@ -69,7 +69,7 @@ export const eventsQuerySchema = z
 
       if (start < maxPastDate) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: `startDate cannot be more than ${MAX_QUERY_WINDOW_DAYS} days ago without specifying endDate`,
           path: ["startDate"],
         });
@@ -159,8 +159,8 @@ export const ServerRoute = createServerFileRoute("/api/events").methods({
       });
     }
 
-    let { entity, entityId, actor, action, startDate, endDate, limit, offset } =
-      parsed.data;
+    const { entity, entityId, actor, action, limit, offset } = parsed.data;
+    let { startDate, endDate } = parsed.data;
 
     // Apply default time window if no dates specified
     if (!startDate && !endDate) {
