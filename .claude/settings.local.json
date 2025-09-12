@@ -8,7 +8,8 @@
       "Bash(git checkout:*)",
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []
