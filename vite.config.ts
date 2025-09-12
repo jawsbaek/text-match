@@ -7,6 +7,23 @@ import tsConfigPaths from "vite-tsconfig-paths";
 /// <reference types="vitest" />
 
 export default defineConfig(() => ({
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress warnings about unused imports from external modules
+        if (warning.code === "UNUSED_EXTERNAL_IMPORT") {
+          return;
+        }
+        // Suppress "use client" directive warnings from React Query
+        if (
+          warning.message?.includes("Module level directives cause errors when bundled")
+        ) {
+          return;
+        }
+        warn(warning);
+      },
+    },
+  },
   plugins: [
     devtools(),
     tsConfigPaths({
@@ -18,6 +35,9 @@ export default defineConfig(() => ({
       tsr: {
         quoteStyle: "double",
         semicolons: true,
+        routesDirectory: "./src/routes",
+        generatedRouteTree: "./src/routeTree.gen.ts",
+        routeFileIgnorePattern: "__tests__",
       },
     }),
     viteReact({
