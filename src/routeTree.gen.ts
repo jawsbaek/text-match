@@ -18,6 +18,8 @@ import { Route as authPagesSignupRouteImport } from "./routes/(auth-pages)/signu
 import { Route as authPagesLoginRouteImport } from "./routes/(auth-pages)/login";
 import { Route as authenticatedDashboardRouteRouteImport } from "./routes/(authenticated)/dashboard/route";
 import { Route as authenticatedDashboardIndexRouteImport } from "./routes/(authenticated)/dashboard/index";
+import { ServerRoute as ApiImportServerRouteImport } from "./routes/api/import";
+import { ServerRoute as ApiExportServerRouteImport } from "./routes/api/export";
 import { ServerRoute as ApiKeysIndexServerRouteImport } from "./routes/api/keys/index";
 import { ServerRoute as ApiTranslationsIdServerRouteImport } from "./routes/api/translations/$id";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
@@ -59,6 +61,16 @@ const authenticatedDashboardIndexRoute =
     path: "/",
     getParentRoute: () => authenticatedDashboardRouteRoute,
   } as any);
+const ApiImportServerRoute = ApiImportServerRouteImport.update({
+  id: "/api/import",
+  path: "/api/import",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiExportServerRoute = ApiExportServerRouteImport.update({
+  id: "/api/export",
+  path: "/api/export",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
 const ApiKeysIndexServerRoute = ApiKeysIndexServerRouteImport.update({
   id: "/api/keys/",
   path: "/api/keys/",
@@ -120,30 +132,54 @@ export interface RootRouteChildren {
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren;
 }
 export interface FileServerRoutesByFullPath {
+  "/api/export": typeof ApiExportServerRoute;
+  "/api/import": typeof ApiImportServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/translations/$id": typeof ApiTranslationsIdServerRoute;
   "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesByTo {
+  "/api/export": typeof ApiExportServerRoute;
+  "/api/import": typeof ApiImportServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/translations/$id": typeof ApiTranslationsIdServerRoute;
   "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
+  "/api/export": typeof ApiExportServerRoute;
+  "/api/import": typeof ApiImportServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/translations/$id": typeof ApiTranslationsIdServerRoute;
   "/api/keys/": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths: "/api/auth/$" | "/api/translations/$id" | "/api/keys";
+  fullPaths:
+    | "/api/export"
+    | "/api/import"
+    | "/api/auth/$"
+    | "/api/translations/$id"
+    | "/api/keys";
   fileServerRoutesByTo: FileServerRoutesByTo;
-  to: "/api/auth/$" | "/api/translations/$id" | "/api/keys";
-  id: "__root__" | "/api/auth/$" | "/api/translations/$id" | "/api/keys/";
+  to:
+    | "/api/export"
+    | "/api/import"
+    | "/api/auth/$"
+    | "/api/translations/$id"
+    | "/api/keys";
+  id:
+    | "__root__"
+    | "/api/export"
+    | "/api/import"
+    | "/api/auth/$"
+    | "/api/translations/$id"
+    | "/api/keys/";
   fileServerRoutesById: FileServerRoutesById;
 }
 export interface RootServerRouteChildren {
+  ApiExportServerRoute: typeof ApiExportServerRoute;
+  ApiImportServerRoute: typeof ApiImportServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
   ApiTranslationsIdServerRoute: typeof ApiTranslationsIdServerRoute;
   ApiKeysIndexServerRoute: typeof ApiKeysIndexServerRoute;
@@ -204,6 +240,20 @@ declare module "@tanstack/react-router" {
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
+    "/api/import": {
+      id: "/api/import";
+      path: "/api/import";
+      fullPath: "/api/import";
+      preLoaderRoute: typeof ApiImportServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/export": {
+      id: "/api/export";
+      path: "/api/export";
+      fullPath: "/api/export";
+      preLoaderRoute: typeof ApiExportServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/keys/": {
       id: "/api/keys/";
       path: "/api/keys";
@@ -277,6 +327,8 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiExportServerRoute: ApiExportServerRoute,
+  ApiImportServerRoute: ApiImportServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiTranslationsIdServerRoute: ApiTranslationsIdServerRoute,
   ApiKeysIndexServerRoute: ApiKeysIndexServerRoute,
