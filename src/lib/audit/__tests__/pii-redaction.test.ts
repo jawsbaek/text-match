@@ -64,13 +64,13 @@ describe("Enhanced PII Redaction", () => {
         entityId: "key-456",
         before: {
           config: {
-            apiKey: "sk_live_1234567890abcdef1234567890abcdef",
+            apiKey: "api_live_1234567890abcdef1234567890abcdef",
             shortKey: "abc123",
           },
         },
         after: {
           config: {
-            apiKey: "sk_prod_9876543210fedcba9876543210fedcba",
+            apiKey: "api_prod_9876543210fedcba9876543210fedcba",
             shortKey: "xyz789",
           },
         },
@@ -197,7 +197,7 @@ describe("Enhanced PII Redaction", () => {
               phone: "555-123-4567",
             },
             settings: {
-              apiKey: "sk_live_1234567890abcdef1234567890abcdef",
+              apiKey: "api_live_1234567890abcdef1234567890abcdef",
               timeout: 30,
             },
           },

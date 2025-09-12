@@ -217,12 +217,12 @@ describe("Events API Redaction", () => {
         before: {
           keyName: "user.settings",
           password: "oldpassword123",
-          apiKey: "sk_live_1234567890abcdef1234567890abcdef",
+          apiKey: "api_live_1234567890abcdef1234567890abcdef",
         },
         after: {
           keyName: "user.settings",
           password: "newpassword456",
-          apiKey: "sk_prod_9876543210fedcba9876543210fedcba",
+          apiKey: "api_prod_9876543210fedcba9876543210fedcba",
         },
         createdAt: new Date(),
       };
