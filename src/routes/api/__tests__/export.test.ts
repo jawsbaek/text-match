@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { exportQuerySchema } from "../export";
 
 describe("Export API Schema Validation", () => {

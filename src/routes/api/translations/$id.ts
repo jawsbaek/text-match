@@ -2,6 +2,7 @@ import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+import { logEvent } from "~/lib/audit/event-logger";
 import { auth } from "~/lib/auth/auth";
 import { verifyIdentityJWT, type IdentityUser } from "~/lib/auth/identity";
 import { createForbiddenResponse, PERMISSIONS } from "~/lib/auth/rbac";
@@ -145,8 +146,34 @@ export const ServerRoute = createServerFileRoute("/api/translations/$id").method
     updateData.version = existingTranslation.version + 1;
     updateData.updatedAt = new Date();
 
+    // Capture before state for audit log
+    const beforeState = {
+      id: existingTranslation.id,
+      keyId: existingTranslation.keyId,
+      locale: existingTranslation.locale,
+      value: existingTranslation.value,
+      status: existingTranslation.status,
+      version: existingTranslation.version,
+    };
+
     // Update the translation
     await db.update(translation).set(updateData).where(eq(translation.id, id));
+
+    // Capture after state for audit log
+    const afterState = {
+      ...beforeState,
+      ...updateData,
+    };
+
+    // Log translation update event
+    await logEvent({
+      actor: user.sub,
+      action: "update",
+      entityType: "translation",
+      entityId: id,
+      before: beforeState,
+      after: afterState,
+    });
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

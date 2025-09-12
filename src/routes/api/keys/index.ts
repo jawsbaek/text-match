@@ -2,6 +2,7 @@ import { createServerFileRoute } from "@tanstack/react-start/server";
 import { and, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
+import { logEvent } from "~/lib/audit/event-logger";
 import { auth } from "~/lib/auth/auth";
 import { verifyIdentityJWT, type IdentityUser } from "~/lib/auth/identity";
 import { createForbiddenResponse, PERMISSIONS } from "~/lib/auth/rbac";
@@ -245,13 +246,25 @@ export const ServerRoute = createServerFileRoute("/api/keys/").methods({
       }
     }
 
-    await db.insert(l10nKey).values({
+    const keyData = {
       id,
       keyName,
       serviceId,
       namespaceId: namespaceId ?? null,
       tags: tags ?? [],
+    };
+
+    await db.insert(l10nKey).values(keyData);
+
+    // Log key creation event
+    await logEvent({
+      actor: user.sub,
+      action: "create",
+      entityType: "l10n_key",
+      entityId: id,
+      after: keyData,
     });
+
     return new Response(null, { status: 201 });
   },
 });
