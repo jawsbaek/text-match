@@ -33,9 +33,9 @@ pre-push:
     - name: eslint-all
       run: bun run eslint src/ --max-warnings 20
 
-    # 테스트 실행 (테스트가 있는 경우)
-    # - name: tests
-    #   run: bun test
+    #테스트 실행 (테스트가 있는 경우)
+    - name: tests
+      run: bun test
 
     # 빌드 테스트
     - name: build-check

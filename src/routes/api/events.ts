@@ -15,10 +15,10 @@ const MAX_QUERY_WINDOW_DAYS = 90;
 // Zod schema for events query parameters with time-based constraints
 export const eventsQuerySchema = z
   .object({
-    entity: z.enum(["key", "translation"]).optional(),
+    entity: z.enum(["l10n_key", "translation", "service"]).optional(),
     entityId: z.string().optional(),
     actor: z.string().optional(),
-    action: z.enum(["create", "update", "delete"]).optional(),
+    action: z.enum(["create", "update", "delete", "import", "export"]).optional(),
     startDate: z
       .string()
       .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid datetime format" })

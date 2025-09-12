@@ -5,7 +5,7 @@ describe("Events API Query Schema", () => {
   describe("eventsQuerySchema validation", () => {
     it("should validate valid query parameters", () => {
       const validQuery = {
-        entity: "key",
+        entity: "l10n_key",
         entityId: "test-key-123",
         actor: "user@example.com",
         action: "create",
@@ -20,7 +20,7 @@ describe("Events API Query Schema", () => {
 
       if (result.success) {
         expect(result.data).toEqual({
-          entity: "key",
+          entity: "l10n_key",
           entityId: "test-key-123",
           actor: "user@example.com",
           action: "create",
@@ -127,6 +127,32 @@ describe("Events API Query Schema", () => {
         expect(result.data.offset).toBe(10);
         expect(typeof result.data.limit).toBe("number");
         expect(typeof result.data.offset).toBe("number");
+      }
+    });
+
+    it("should accept all valid entity types", () => {
+      const validEntities = ["l10n_key", "translation", "service"];
+
+      for (const entity of validEntities) {
+        const query = { entity };
+        const result = eventsQuerySchema.safeParse(query);
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.entity).toBe(entity);
+        }
+      }
+    });
+
+    it("should accept all valid action types", () => {
+      const validActions = ["create", "update", "delete", "import", "export"];
+
+      for (const action of validActions) {
+        const query = { action };
+        const result = eventsQuerySchema.safeParse(query);
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.action).toBe(action);
+        }
       }
     });
   });

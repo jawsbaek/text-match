@@ -9,7 +9,9 @@
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
       "Bash(node:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []
