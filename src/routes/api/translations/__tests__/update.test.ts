@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { updateTranslationSchema } from "../$id";
+import { updateTranslationSchema } from "~/routes/api/translations/$id";
 
 describe("Translations API Update", () => {
   describe("Update Schema Validation", () => {
@@ -107,9 +107,14 @@ describe("Translations API Update", () => {
       expect(result.success).toBe(false);
 
       if (!result.success) {
-        expect(result.error.issues.some((issue) => issue.path.includes("locale"))).toBe(
-          true,
-        );
+        expect(
+          result.error.issues.some(
+            (issue) =>
+              "path" in issue &&
+              Array.isArray(issue.path) &&
+              issue.path.includes("locale"),
+          ),
+        ).toBe(true);
       }
     });
   });

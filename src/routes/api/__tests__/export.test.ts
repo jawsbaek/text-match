@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exportQuerySchema } from "../export";
+import { exportQuerySchema } from "~/routes/api/export";
 
 describe("Export API Schema Validation", () => {
   describe("exportQuerySchema", () => {
@@ -48,7 +48,12 @@ describe("Export API Schema Validation", () => {
       if (!result.success) {
         expect(
           result.error.issues.some(
-            (issue) => issue.path.includes("service") && issue.code === "too_small",
+            (issue) =>
+              "path" in issue &&
+              Array.isArray(issue.path) &&
+              issue.path.includes("service") &&
+              "code" in issue &&
+              issue.code === "too_small",
           ),
         ).toBe(true);
       }
@@ -64,7 +69,12 @@ describe("Export API Schema Validation", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(
-          result.error.issues.some((issue) => issue.path.some((p) => p === "format")),
+          result.error.issues.some(
+            (issue) =>
+              "path" in issue &&
+              Array.isArray(issue.path) &&
+              issue.path.some((p) => p === "format"),
+          ),
         ).toBe(true);
       }
     });
@@ -79,7 +89,12 @@ describe("Export API Schema Validation", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(
-          result.error.issues.some((issue) => issue.path.some((p) => p === "status")),
+          result.error.issues.some(
+            (issue) =>
+              "path" in issue &&
+              Array.isArray(issue.path) &&
+              issue.path.some((p) => p === "status"),
+          ),
         ).toBe(true);
       }
     });
@@ -189,7 +204,12 @@ describe("Export API Schema Validation", () => {
       if (!result.success) {
         expect(
           result.error.issues.some(
-            (issue) => issue.path.includes("service") && issue.code === "invalid_type",
+            (issue) =>
+              "path" in issue &&
+              Array.isArray(issue.path) &&
+              issue.path.includes("service") &&
+              "code" in issue &&
+              issue.code === "invalid_type",
           ),
         ).toBe(true);
       }

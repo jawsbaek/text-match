@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { eventsQuerySchema } from "../events";
+import { eventsQuerySchema } from "~/routes/api/events";
 
 describe("Events API Query Schema", () => {
   describe("eventsQuerySchema validation", () => {
