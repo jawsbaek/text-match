@@ -1,4 +1,3 @@
-// @ts-nocheck - Temporarily disable TypeScript for redaction tests
 import { describe, expect, it } from "vitest";
 import {
   createRedactionConfig,
@@ -28,10 +27,14 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.before as any).value).toBe("Contact us at [EMAIL_REDACTED] for help");
-      expect((redacted.after as any).value).toBe("Reach out to [EMAIL_REDACTED] for assistance");
-      expect((redacted.before as any).status).toBe("draft");
-      expect((redacted.after as any).status).toBe("active");
+      expect((redacted.before as Record<string, unknown>).value).toBe(
+        "Contact us at [EMAIL_REDACTED] for help",
+      );
+      expect((redacted.after as Record<string, unknown>).value).toBe(
+        "Reach out to [EMAIL_REDACTED] for assistance",
+      );
+      expect((redacted.before as Record<string, unknown>).status).toBe("draft");
+      expect((redacted.after as Record<string, unknown>).status).toBe("active");
     });
 
     it("should redact phone numbers in translation values", () => {
@@ -49,10 +52,10 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.after as any).value).toBe(
+      expect((redacted.after as Record<string, unknown>).value).toBe(
         "Call us at [PHONE_REDACTED] or [PHONE_REDACTED]",
       );
-      expect((redacted.after as any).locale).toBe("en");
+      expect((redacted.after as Record<string, unknown>).locale).toBe("en");
     });
 
     it("should redact API keys and tokens", () => {
@@ -78,10 +81,22 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.before as any).config.apiKey).toBe("[REDACTED: sensitive field name]");
-      expect((redacted.after as any).config.apiKey).toBe("[REDACTED: sensitive field name]");
-      expect((redacted.before as any).config.shortKey).toBe("[REDACTED: sensitive field name]"); // "shortKey" contains "key"
-      expect((redacted.after as any).config.shortKey).toBe("[REDACTED: sensitive field name]");
+      expect(
+        ((redacted.before as Record<string, unknown>).config as Record<string, unknown>)
+          .apiKey,
+      ).toBe("[REDACTED: sensitive field name]");
+      expect(
+        ((redacted.after as Record<string, unknown>).config as Record<string, unknown>)
+          .apiKey,
+      ).toBe("[REDACTED: sensitive field name]");
+      expect(
+        ((redacted.before as Record<string, unknown>).config as Record<string, unknown>)
+          .shortKey,
+      ).toBe("[REDACTED: sensitive field name]"); // "shortKey" contains "key"
+      expect(
+        ((redacted.after as Record<string, unknown>).config as Record<string, unknown>)
+          .shortKey,
+      ).toBe("[REDACTED: sensitive field name]");
     });
 
     it("should redact credit card numbers", () => {
@@ -98,7 +113,7 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.after as any).value).toBe(
+      expect((redacted.after as Record<string, unknown>).value).toBe(
         "Payment: [CREDITCARD_REDACTED] or [CREDITCARD_REDACTED]",
       );
     });
@@ -124,12 +139,24 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.before as any).password).toBe("[REDACTED: sensitive field name]");
-      expect((redacted.before as any).secret_key).toBe("[REDACTED: sensitive field name]");
-      expect((redacted.after as any).password).toBe("[REDACTED: sensitive field name]");
-      expect((redacted.after as any).api_token).toBe("[REDACTED: sensitive field name]");
-      expect((redacted.before as any).publicData).toBe("this is public");
-      expect((redacted.after as any).publicData).toBe("this is still public");
+      expect((redacted.before as Record<string, unknown>).password).toBe(
+        "[REDACTED: sensitive field name]",
+      );
+      expect((redacted.before as Record<string, unknown>).secret_key).toBe(
+        "[REDACTED: sensitive field name]",
+      );
+      expect((redacted.after as Record<string, unknown>).password).toBe(
+        "[REDACTED: sensitive field name]",
+      );
+      expect((redacted.after as Record<string, unknown>).api_token).toBe(
+        "[REDACTED: sensitive field name]",
+      );
+      expect((redacted.before as Record<string, unknown>).publicData).toBe(
+        "this is public",
+      );
+      expect((redacted.after as Record<string, unknown>).publicData).toBe(
+        "this is still public",
+      );
     });
 
     it("should handle whitelisted fields", () => {
@@ -154,11 +181,15 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord, config);
 
-      expect((redacted.after as any).id).toBe("trans-456");
-      expect((redacted.after as any).status).toBe("active");
-      expect((redacted.after as any).version).toBe(1);
-      expect((redacted.after as any).special_field).toBe("[EMAIL_REDACTED]"); // Not whitelisted, so email gets redacted
-      expect((redacted.after as any).regular_field).toBe("[EMAIL_REDACTED]"); // Email gets completely redacted
+      expect((redacted.after as Record<string, unknown>).id).toBe("trans-456");
+      expect((redacted.after as Record<string, unknown>).status).toBe("active");
+      expect((redacted.after as Record<string, unknown>).version).toBe(1);
+      expect((redacted.after as Record<string, unknown>).special_field).toBe(
+        "[EMAIL_REDACTED]",
+      ); // Not whitelisted, so email gets redacted
+      expect((redacted.after as Record<string, unknown>).regular_field).toBe(
+        "[EMAIL_REDACTED]",
+      ); // Email gets completely redacted
     });
 
     it("should handle long values with length-based redaction", () => {
@@ -177,10 +208,10 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.before as any).value).toBe(
+      expect((redacted.before as Record<string, unknown>).value).toBe(
         "[REDACTED: 150 characters - exceeds 100 chars]",
       );
-      expect((redacted.before as any).status).toBe("draft");
+      expect((redacted.before as Record<string, unknown>).status).toBe("draft");
     });
 
     it("should handle nested objects", () => {
@@ -206,12 +237,46 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.after as any).metadata.contact.email).toBe("[EMAIL_REDACTED]");
-      expect((redacted.after as any).metadata.contact.phone).toBe("[PHONE_REDACTED]");
-      expect((redacted.after as any).metadata.settings.apiKey).toBe(
-        "[REDACTED: sensitive field name]",
-      );
-      expect((redacted.after as any).metadata.settings.timeout).toBe(30);
+      expect(
+        (
+          (
+            (redacted.after as Record<string, unknown>).metadata as Record<
+              string,
+              unknown
+            >
+          ).contact as Record<string, unknown>
+        ).email,
+      ).toBe("[EMAIL_REDACTED]");
+      expect(
+        (
+          (
+            (redacted.after as Record<string, unknown>).metadata as Record<
+              string,
+              unknown
+            >
+          ).contact as Record<string, unknown>
+        ).phone,
+      ).toBe("[PHONE_REDACTED]");
+      expect(
+        (
+          (
+            (redacted.after as Record<string, unknown>).metadata as Record<
+              string,
+              unknown
+            >
+          ).settings as Record<string, unknown>
+        ).apiKey,
+      ).toBe("[REDACTED: sensitive field name]");
+      expect(
+        (
+          (
+            (redacted.after as Record<string, unknown>).metadata as Record<
+              string,
+              unknown
+            >
+          ).settings as Record<string, unknown>
+        ).timeout,
+      ).toBe(30);
     });
 
     it("should handle arrays", () => {
@@ -229,10 +294,19 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord);
 
-      expect((redacted.after as any).contacts[0]).toBe("[EMAIL_REDACTED]");
-      expect((redacted.after as any).contacts[1]).toBe("[EMAIL_REDACTED]");
-      expect((redacted.after as any).contacts[2]).toBe("Call [PHONE_REDACTED]");
-      expect((redacted.after as any).tags).toEqual(["public", "safe"]);
+      expect(((redacted.after as Record<string, unknown>).contacts as unknown[])[0]).toBe(
+        "[EMAIL_REDACTED]",
+      );
+      expect(((redacted.after as Record<string, unknown>).contacts as unknown[])[1]).toBe(
+        "[EMAIL_REDACTED]",
+      );
+      expect(((redacted.after as Record<string, unknown>).contacts as unknown[])[2]).toBe(
+        "Call [PHONE_REDACTED]",
+      );
+      expect((redacted.after as Record<string, unknown>).tags).toEqual([
+        "public",
+        "safe",
+      ]);
     });
 
     it("should handle custom redaction config", () => {
@@ -256,8 +330,10 @@ describe("Enhanced PII Redaction", () => {
 
       const redacted = redactSensitiveData(eventRecord, customConfig);
 
-      expect((redacted.after as any).value).toBe("[REDACTED: 59 characters - exceeds 50 chars]");
-      expect((redacted.after as any).password).toBe("secret123"); // Field name detection disabled
+      expect((redacted.after as Record<string, unknown>).value).toBe(
+        "[REDACTED: 59 characters - exceeds 50 chars]",
+      );
+      expect((redacted.after as Record<string, unknown>).password).toBe("secret123"); // Field name detection disabled
     });
   });
 

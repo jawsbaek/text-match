@@ -19,8 +19,14 @@ export const eventsQuerySchema = z
     entityId: z.string().optional(),
     actor: z.string().optional(),
     action: z.enum(["create", "update", "delete"]).optional(),
-    startDate: z.string().datetime({ message: "Invalid datetime format" }).optional(),
-    endDate: z.string().datetime({ message: "Invalid datetime format" }).optional(),
+    startDate: z
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid datetime format" })
+      .optional(),
+    endDate: z
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid datetime format" })
+      .optional(),
     limit: z.coerce.number().min(1).max(100).default(50),
     offset: z.coerce.number().min(0).default(0),
   })
