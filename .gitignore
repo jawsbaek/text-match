@@ -27,3 +27,4 @@ routeTree.gen.ts
 # BMAD (local only)
 src/routeTree.gen.ts
 drizzle/
+.claude/settings.local.json
