@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getKeysQuerySchema } from "../index";
+import { getKeysQuerySchema } from "~/routes/api/keys/index";
 
 describe("Keys API Filters", () => {
   describe("Query Parameter Validation", () => {

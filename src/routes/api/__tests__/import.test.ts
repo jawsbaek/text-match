@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { importPayloadSchema } from "~/lib/api/import-export-types";
+import { importPayloadSchema, type SupportedLocale } from "~/lib/api/import-export-types";
 
 describe("Import API Schema Validation", () => {
   describe("importPayloadSchema", () => {
@@ -241,7 +241,7 @@ describe("Import API Schema Validation", () => {
                 keyName: "test.key",
                 translations: [
                   {
-                    locale: locale as any,
+                    locale: locale as SupportedLocale,
                     value: "Test value",
                   },
                 ],

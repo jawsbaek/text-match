@@ -20,6 +20,7 @@ import { Route as authenticatedDashboardRouteRouteImport } from "./routes/(authe
 import { Route as authenticatedDashboardIndexRouteImport } from "./routes/(authenticated)/dashboard/index";
 import { ServerRoute as ApiImportServerRouteImport } from "./routes/api/import";
 import { ServerRoute as ApiExportServerRouteImport } from "./routes/api/export";
+import { ServerRoute as ApiEventsServerRouteImport } from "./routes/api/events";
 import { ServerRoute as ApiKeysIndexServerRouteImport } from "./routes/api/keys/index";
 import { ServerRoute as ApiTranslationsIdServerRouteImport } from "./routes/api/translations/$id";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
@@ -69,6 +70,11 @@ const ApiImportServerRoute = ApiImportServerRouteImport.update({
 const ApiExportServerRoute = ApiExportServerRouteImport.update({
   id: "/api/export",
   path: "/api/export",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiEventsServerRoute = ApiEventsServerRouteImport.update({
+  id: "/api/events",
+  path: "/api/events",
   getParentRoute: () => rootServerRouteImport,
 } as any);
 const ApiKeysIndexServerRoute = ApiKeysIndexServerRouteImport.update({
@@ -132,6 +138,7 @@ export interface RootRouteChildren {
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren;
 }
 export interface FileServerRoutesByFullPath {
+  "/api/events": typeof ApiEventsServerRoute;
   "/api/export": typeof ApiExportServerRoute;
   "/api/import": typeof ApiImportServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
@@ -139,6 +146,7 @@ export interface FileServerRoutesByFullPath {
   "/api/keys": typeof ApiKeysIndexServerRoute;
 }
 export interface FileServerRoutesByTo {
+  "/api/events": typeof ApiEventsServerRoute;
   "/api/export": typeof ApiExportServerRoute;
   "/api/import": typeof ApiImportServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
@@ -147,6 +155,7 @@ export interface FileServerRoutesByTo {
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
+  "/api/events": typeof ApiEventsServerRoute;
   "/api/export": typeof ApiExportServerRoute;
   "/api/import": typeof ApiImportServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
@@ -156,6 +165,7 @@ export interface FileServerRoutesById {
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
   fullPaths:
+    | "/api/events"
     | "/api/export"
     | "/api/import"
     | "/api/auth/$"
@@ -163,6 +173,7 @@ export interface FileServerRouteTypes {
     | "/api/keys";
   fileServerRoutesByTo: FileServerRoutesByTo;
   to:
+    | "/api/events"
     | "/api/export"
     | "/api/import"
     | "/api/auth/$"
@@ -170,6 +181,7 @@ export interface FileServerRouteTypes {
     | "/api/keys";
   id:
     | "__root__"
+    | "/api/events"
     | "/api/export"
     | "/api/import"
     | "/api/auth/$"
@@ -178,6 +190,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesById: FileServerRoutesById;
 }
 export interface RootServerRouteChildren {
+  ApiEventsServerRoute: typeof ApiEventsServerRoute;
   ApiExportServerRoute: typeof ApiExportServerRoute;
   ApiImportServerRoute: typeof ApiImportServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
@@ -254,6 +267,13 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiExportServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+    "/api/events": {
+      id: "/api/events";
+      path: "/api/events";
+      fullPath: "/api/events";
+      preLoaderRoute: typeof ApiEventsServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/keys/": {
       id: "/api/keys/";
       path: "/api/keys";
@@ -327,6 +347,7 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiEventsServerRoute: ApiEventsServerRoute,
   ApiExportServerRoute: ApiExportServerRoute,
   ApiImportServerRoute: ApiImportServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
